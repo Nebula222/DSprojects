@@ -15,7 +15,7 @@ fontsize: 12pt
 
 
 ## Introduction
-The 2018 World Happiness Report is a survey that ranks 162 countries by their happiness level. It is published by the Sustainable Development Solutions Network(SDSN). The 2018 release of Gallup World Poll covers 1,562 observations of happiness scores in the period of 2005 to 2017. Not all the countries and territories appear in all the years. For example, Canada is not included in the 2017 Happiness Index. 
+The 2018 World Happiness Report is a survey that ranks 156 countries by their happiness level. It is published by the Sustainable Development Solutions Network(SDSN). The 2018 release of Gallup World Poll covers 1,562 observations of happiness scores in the period of 2005 to 2017. Not all the countries and territories appear in all the years. For example, Canada is not included in the 2017 Happiness Index. 
 
 
 ```{r setup, include=FALSE}
@@ -37,12 +37,12 @@ They are GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, Perc
 ```{r, echo= FALSE}
 
 H2018 <- Happiness[, 1:9]
-H2018 <- H2018 %>% filter(year == c(2015, 2016, 2017))
+H2018 <- H2018 %>% filter(year %in% c(2015, 2016, 2017))
 
 ```
 
 
-## Check the new dimension for H2018 - 158 x 9 
+## Check the new dimension for H2018 - 426 x 9 
 
 ```{r}
 dim(H2018)
@@ -68,7 +68,7 @@ sum(is.na(H2018))
 hist(H2018$`Life Ladder`, xlab = "Happiness Index", main = "Happiness Score Distribution - 2015, 2016, and 2018", col = "thistle")
 ```
 
-The standard deviation is 1.03
+The standard deviation is 1.12
 ```{r, echo= FALSE}
 sd(H2018$`Life Ladder`)
 ```
@@ -105,7 +105,7 @@ sum(is.na(happy_df))
 
 We look at the cofficients in the t-test. The MLR function for the six key features is the following:
 
-Life Ladder (Happiness) = -0.04 + 0.03 GDP + 1.16 Social Support + 0.09 Life Expectancy + 1.57 Freedom - 0.00 Generosity - 0.67 Corruption
+Life Ladder (Happiness) = -0.04 + 0.03 GDP + 1.16 Social Support + 0.09 Healthy Life Expectancy + 1.57 Freedom - 0.00 Generosity - 0.67 Perceptions of Corruption
 
 The coefficient of multiple determination, R squared lies between 0 and 1 and is a descriptive measure of the utility of the regression for making predictions.
 
@@ -157,8 +157,8 @@ Reduced Model:
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_3 Health + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  $$
 ## ANNOVA for the partial model interpretation: 
 
-By looking at the p value for the f test (p > 0.5), we do not reject the null hypothesis. At the 5% significance level, the data doesn't provide sufficient edvidence to reject the null ${beta_1 = beta_2 = beta_5 = 0}$ . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are not useful predictors of the happiness. 
-```{r, include= FALSE}
+By looking at the p value for the f test, p value = 0.05858 (p > 0.5), we do not reject the null hypothesis. At the 5% significance level, the data doesn't provide sufficient edvidence to reject the null ${beta_1 = beta_2 = beta_5 = 0}$ . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are not useful predictors of the happiness. 
+```{r, include= TRUE}
 partial_H <- lm(`Life Ladder` ~ `Healthy life expectancy at birth` + `Freedom to make life choices` + `Perceptions of corruption` , data = happy_df)
 
 anova(partial_H, df)
