@@ -109,7 +109,7 @@ vif(df)
 ```
 
 
-## ANNOVA - MLR Hypothesis case 1. 
+## ANOVA - MLR Hypothesis case 1. 
 
 We test if all slope parameters are 0.
 
@@ -125,7 +125,7 @@ $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 \end{aligned}$$
 ## Hypothesis Intepretation:
 By looking at the F statistics and the p value (${p < 2.2e-16 }$), we can interpret that at the 5% significance level, the data provide sufficient evidence to conclude that at least one of the life ladder (happiness index) regression coefficients is not 0. Therefore, taken together, GDP, social support, healthly life expectancy at birth, freedom, generosity, and perceptions of corruption are useful in predicting happiness for a country. 
 
-## ANNOVA - MLR Hypothesis case 2. 
+## ANOVA - MLR Hypothesis case 2. 
 
 By looking at the p value for the t test above, it looks like GDP, Social Support, and Generosity are not statistically significant. In other words, is happiness significantly related to GDP, Soical Support, and Generosity after taking into account other factors such as Health, Freedom, and Perceptions of Corruption? Let's make another hypothesis for the second case.  
 
@@ -135,7 +135,7 @@ Full Model:
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  $$
 Reduced Model:
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_3 Health + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  $$
-## ANNOVA for the partial model interpretation: 
+## ANOVA for the partial model interpretation: 
 
 By looking at the p value for the f test, p value = 2.2e-16 (p < 0.05), we reject the null hypothesis. At the 5% significance level, the data provides sufficient edvidence to reject the null ${beta_1 = beta_2 = beta_5 = 0}$ . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are useful predictors of the happiness. 
 ```{r, include= TRUE}
