@@ -73,30 +73,10 @@ The standard deviation is 1.12
 sd(H2018$`Life Ladder`)
 ```
 
-
-## Create a function for the linear data normalization
-
-```{r, include= TRUE}
-
-normalization <- function(x) {
-  (x - min(x)) / (max(x) - min(x))
-}
-```
-
-
-## Create a function for denormalization 
-```{r, include= TRUE}
-
-Unnormalize <- function(x, y) {
-  y * (max(x) - min(x)) + min(x)
-}
-```
-
-
-## Normalize the new dataframe - H2018
+## Extract 6 key featuers and put them in the new data frame
 
 ```{r, include=TRUE}
-happy_df <- normalization(H2018[, 3:9])
+happy_df <- H2018[, 3:9]
 sum(is.na(happy_df))
 ```             
 
@@ -105,18 +85,18 @@ sum(is.na(happy_df))
 
 We look at the cofficients in the t-test. The MLR function for the six key features is the following:
 
-Life Ladder (Happiness) = -0.04 + 0.03 GDP + 1.16 Social Support + 0.09 Healthy Life Expectancy + 1.57 Freedom - 0.00 Generosity - 0.67 Perceptions of Corruption
+Life Ladder (Happiness) = -0.54 + 0.03 GDP + 2.99 Social Support + 0.04 Healthy Life Expectancy + 1.25 Freedom - 0.32 Generosity - 0.70 Perceptions of Corruption
 
 The coefficient of multiple determination, R squared lies between 0 and 1 and is a descriptive measure of the utility of the regression for making predictions.
 
-The adjusted for R squared is 0.61  ($R^{2}$= 0.61), which indicates the regression equation is SOMEWHAT useful for making predictions.
+The adjusted for R squared is 0.63  ($R^{2}$= 0.63), which indicates the regression equation is SOMEWHAT useful for making predictions.
 ```{r, echo=FALSE}
 df <- lm(`Life Ladder` ~., data = happy_df)
 summary(df)
 ```
 
 ## Model Intepretation:
-Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particlar GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.8674. 
+Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particlar GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.6813. 
 
 ## Variance Inflation Factor: 
 
@@ -157,12 +137,13 @@ Reduced Model:
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_3 Health + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  $$
 ## ANNOVA for the partial model interpretation: 
 
-By looking at the p value for the f test, p value = 0.05858 (p > 0.5), we do not reject the null hypothesis. At the 5% significance level, the data doesn't provide sufficient edvidence to reject the null ${beta_1 = beta_2 = beta_5 = 0}$ . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are not useful predictors of the happiness. 
+By looking at the p value for the f test, p value = 2.2e-16 (p < 0.05), we reject the null hypothesis. At the 5% significance level, the data provides sufficient edvidence to reject the null ${beta_1 = beta_2 = beta_5 = 0}$ . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are useful predictors of the happiness. 
 ```{r, include= TRUE}
 partial_H <- lm(`Life Ladder` ~ `Healthy life expectancy at birth` + `Freedom to make life choices` + `Perceptions of corruption` , data = happy_df)
 
 anova(partial_H, df)
 
 ```
+
 
 

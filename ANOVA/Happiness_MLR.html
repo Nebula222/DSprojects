@@ -131,14 +131,12 @@ $(document).ready(function () {
 <li><a href="#check-the-new-dimension-for-h2018---426-x-9"><span class="toc-section-number">0.3</span> Check the new dimension for H2018 - 426 x 9</a></li>
 <li><a href="#checking-missing-data"><span class="toc-section-number">0.4</span> Checking Missing Data</a></li>
 <li><a href="#happiness-score-distribution"><span class="toc-section-number">0.5</span> Happiness Score Distribution</a></li>
-<li><a href="#create-a-function-for-the-linear-data-normalization"><span class="toc-section-number">0.6</span> Create a function for the linear data normalization</a></li>
-<li><a href="#create-a-function-for-denormalization"><span class="toc-section-number">0.7</span> Create a function for denormalization</a></li>
-<li><a href="#normalize-the-new-dataframe---h2018"><span class="toc-section-number">0.8</span> Normalize the new dataframe - H2018</a></li>
-<li><a href="#lets-create-a-multiple-linear-regression-model-using-the-six-key-features."><span class="toc-section-number">0.9</span> Let’s create a multiple linear regression model using the six key features.</a></li>
-<li><a href="#model-intepretation"><span class="toc-section-number">0.10</span> Model Intepretation:</a></li>
-<li><a href="#variance-inflation-factor"><span class="toc-section-number">0.11</span> Variance Inflation Factor:</a></li>
-<li><a href="#annova---mlr-hypothesis-case-1."><span class="toc-section-number">0.12</span> ANNOVA - MLR Hypothesis case 1.</a></li>
-<li><a href="#annova---mlr-hypothesis-case-2."><span class="toc-section-number">0.13</span> ANNOVA - MLR Hypothesis case 2.</a></li>
+<li><a href="#extract-6-key-featuers-and-put-them-in-the-new-data-frame"><span class="toc-section-number">0.6</span> Extract 6 key featuers and put them in the new data frame</a></li>
+<li><a href="#lets-create-a-multiple-linear-regression-model-using-the-six-key-features."><span class="toc-section-number">0.7</span> Let’s create a multiple linear regression model using the six key features.</a></li>
+<li><a href="#model-intepretation"><span class="toc-section-number">0.8</span> Model Intepretation:</a></li>
+<li><a href="#variance-inflation-factor"><span class="toc-section-number">0.9</span> Variance Inflation Factor:</a></li>
+<li><a href="#annova---mlr-hypothesis-case-1."><span class="toc-section-number">0.10</span> ANNOVA - MLR Hypothesis case 1.</a></li>
+<li><a href="#annova---mlr-hypothesis-case-2."><span class="toc-section-number">0.11</span> ANNOVA - MLR Hypothesis case 2.</a></li>
 </ul>
 </div>
 
@@ -167,49 +165,37 @@ $(document).ready(function () {
 <p>The standard deviation is 1.12</p>
 <pre><code>## [1] 1.123839</code></pre>
 </div>
-<div id="create-a-function-for-the-linear-data-normalization" class="section level2">
-<h2><span class="header-section-number">0.6</span> Create a function for the linear data normalization</h2>
-<pre class="r"><code>normalization &lt;- function(x) {
-  (x - min(x)) / (max(x) - min(x))
-}</code></pre>
-</div>
-<div id="create-a-function-for-denormalization" class="section level2">
-<h2><span class="header-section-number">0.7</span> Create a function for denormalization</h2>
-<pre class="r"><code>Unnormalize &lt;- function(x, y) {
-  y * (max(x) - min(x)) + min(x)
-}</code></pre>
-</div>
-<div id="normalize-the-new-dataframe---h2018" class="section level2">
-<h2><span class="header-section-number">0.8</span> Normalize the new dataframe - H2018</h2>
-<pre class="r"><code>happy_df &lt;- normalization(H2018[, 3:9])
+<div id="extract-6-key-featuers-and-put-them-in-the-new-data-frame" class="section level2">
+<h2><span class="header-section-number">0.6</span> Extract 6 key featuers and put them in the new data frame</h2>
+<pre class="r"><code>happy_df &lt;- H2018[, 3:9]
 sum(is.na(happy_df))</code></pre>
 <pre><code>## [1] 0</code></pre>
 </div>
 <div id="lets-create-a-multiple-linear-regression-model-using-the-six-key-features." class="section level2">
-<h2><span class="header-section-number">0.9</span> Let’s create a multiple linear regression model using the six key features.</h2>
+<h2><span class="header-section-number">0.7</span> Let’s create a multiple linear regression model using the six key features.</h2>
 <p>We look at the cofficients in the t-test. The MLR function for the six key features is the following:</p>
-<p>Life Ladder (Happiness) = -0.04 + 0.03 GDP + 1.16 Social Support + 0.09 Healthy Life Expectancy + 1.57 Freedom - 0.00 Generosity - 0.67 Perceptions of Corruption</p>
+<p>Life Ladder (Happiness) = -0.54 + 0.03 GDP + 2.99 Social Support + 0.04 Healthy Life Expectancy + 1.25 Freedom - 0.32 Generosity - 0.70 Perceptions of Corruption</p>
 <p>The coefficient of multiple determination, R squared lies between 0 and 1 and is a descriptive measure of the utility of the regression for making predictions.</p>
-<p>The adjusted for R squared is 0.61 (<span class="math inline">\(R^{2}\)</span>= 0.61), which indicates the regression equation is SOMEWHAT useful for making predictions.</p>
+<p>The adjusted for R squared is 0.63 (<span class="math inline">\(R^{2}\)</span>= 0.63), which indicates the regression equation is SOMEWHAT useful for making predictions.</p>
 <pre><code>## 
 ## Call:
 ## lm(formula = `Life Ladder` ~ ., data = happy_df)
 ## 
 ## Residuals:
-##       Min        1Q    Median        3Q       Max 
-## -0.025298 -0.005667  0.000179  0.005569  0.045737 
+##     Min      1Q  Median      3Q     Max 
+## -1.9437 -0.4354  0.0138  0.4279  3.5141 
 ## 
 ## Coefficients:
 ##                                     Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)                        -0.018385   0.004877  -3.770 0.000187
-## `Log GDP per capita`                0.028177   0.021439   1.314 0.189456
+## (Intercept)                        -0.543082   0.307539  -1.766   0.0781
+## `Log GDP per capita`                0.028177   0.021439   1.314   0.1895
 ## `Social support`                    2.990840   0.314822   9.500  &lt; 2e-16
 ## `Healthy life expectancy at birth`  0.045516   0.005238   8.690  &lt; 2e-16
 ## `Freedom to make life choices`      1.247626   0.241297   5.170 3.62e-07
-## Generosity                          0.320778   0.222776   1.440 0.150639
+## Generosity                          0.320778   0.222776   1.440   0.1506
 ## `Perceptions of corruption`        -0.702811   0.129514  -5.427 9.74e-08
 ##                                       
-## (Intercept)                        ***
+## (Intercept)                        .  
 ## `Log GDP per capita`                  
 ## `Social support`                   ***
 ## `Healthy life expectancy at birth` ***
@@ -219,16 +205,16 @@ sum(is.na(happy_df))</code></pre>
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.008867 on 419 degrees of freedom
+## Residual standard error: 0.6813 on 419 degrees of freedom
 ## Multiple R-squared:  0.6377, Adjusted R-squared:  0.6325 
 ## F-statistic: 122.9 on 6 and 419 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="model-intepretation" class="section level2">
-<h2><span class="header-section-number">0.10</span> Model Intepretation:</h2>
-<p>Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particlar GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.8674.</p>
+<h2><span class="header-section-number">0.8</span> Model Intepretation:</h2>
+<p>Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particlar GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.6813.</p>
 </div>
 <div id="variance-inflation-factor" class="section level2">
-<h2><span class="header-section-number">0.11</span> Variance Inflation Factor:</h2>
+<h2><span class="header-section-number">0.9</span> Variance Inflation Factor:</h2>
 <p>Let’s check if any of the six key variables have multicollinearity. VIF measures and indicates how much variance of an estimated regression coefficient is increased because of collinearity. If any of these variables has high VIF, then it is a highly correlated predictor variable. By looking at the variance inflation factor below, none of these key variables has VIF higher than 5, thus they are not highly correlated predictor variables.</p>
 <pre><code>## Warning: package 'car' was built under R version 3.4.1</code></pre>
 <pre><code>## 
@@ -244,16 +230,16 @@ sum(is.na(happy_df))</code></pre>
 ##                           1.124961                           1.099767</code></pre>
 </div>
 <div id="annova---mlr-hypothesis-case-1." class="section level2">
-<h2><span class="header-section-number">0.12</span> ANNOVA - MLR Hypothesis case 1.</h2>
+<h2><span class="header-section-number">0.10</span> ANNOVA - MLR Hypothesis case 1.</h2>
 <p>We test if all slope parameters are 0.</p>
 <p>The following is the hypothesis for the mutilple linear regression model for six features.</p>
 <p><span class="math display">\[   \begin{aligned} H_0: \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 PerceptionCorruption = 0 \end{aligned} \]</span> <span class="math display">\[   \begin{aligned} H_a:  At\ Least\ One\ Of\ The\ Variables\ \beta_j \not= 0\end{aligned} \]</span> Full Model: <span class="math display">\[   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  \]</span> Reduced Model: <span class="math display">\[   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 \end{aligned}\]</span> ## Hypothesis Intepretation: By looking at the F statistics and the p value (<span class="math inline">\({p &lt; 2.2e-16 }\)</span>), we can interpret that at the 5% significance level, the data provide sufficient evidence to conclude that at least one of the life ladder (happiness index) regression coefficients is not 0. Therefore, taken together, GDP, social support, healthly life expectancy at birth, freedom, generosity, and perceptions of corruption are useful in predicting happiness for a country.</p>
 </div>
 <div id="annova---mlr-hypothesis-case-2." class="section level2">
-<h2><span class="header-section-number">0.13</span> ANNOVA - MLR Hypothesis case 2.</h2>
+<h2><span class="header-section-number">0.11</span> ANNOVA - MLR Hypothesis case 2.</h2>
 <p>By looking at the p value for the t test above, it looks like GDP, Social Support, and Generosity are not statistically significant. In other words, is happiness significantly related to GDP, Soical Support, and Generosity after taking into account other factors such as Health, Freedom, and Perceptions of Corruption? Let’s make another hypothesis for the second case.</p>
 <p><span class="math display">\[   \begin{aligned} H_0: \beta_1 GDP = \beta_2 SocialSupport = \beta_5 Generosity  = 0 \end{aligned} \]</span> <span class="math display">\[   \begin{aligned} H_a: At\ Least\ One\ Of\ The\ Variables\  \beta_1 , \beta_2 ,\beta_5 \not= 0 \end{aligned} \]</span> Full Model: <span class="math display">\[   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  \]</span> Reduced Model: <span class="math display">\[   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_3 Health + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  \]</span> ## ANNOVA for the partial model interpretation:</p>
-<p>By looking at the p value for the f test, p value = 0.05858 (p &gt; 0.5), we do not reject the null hypothesis. At the 5% significance level, the data doesn’t provide sufficient edvidence to reject the null <span class="math inline">\({beta_1 = beta_2 = beta_5 = 0}\)</span> . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are not useful predictors of the happiness.</p>
+<p>By looking at the p value for the f test, p value = 2.2e-16 (p &lt; 0.05), we reject the null hypothesis. At the 5% significance level, the data provides sufficient edvidence to reject the null <span class="math inline">\({beta_1 = beta_2 = beta_5 = 0}\)</span> . Hence, in conjunction with other variables, GDP, Social Support, and Generosity are useful predictors of the happiness.</p>
 <pre class="r"><code>partial_H &lt;- lm(`Life Ladder` ~ `Healthy life expectancy at birth` + `Freedom to make life choices` + `Perceptions of corruption` , data = happy_df)
 
 anova(partial_H, df)</code></pre>
@@ -263,9 +249,9 @@ anova(partial_H, df)</code></pre>
 ##     `Perceptions of corruption`
 ## Model 2: `Life Ladder` ~ `Log GDP per capita` + `Social support` + `Healthy life expectancy at birth` + 
 ##     `Freedom to make life choices` + Generosity + `Perceptions of corruption`
-##   Res.Df      RSS Df Sum of Sq      F    Pr(&gt;F)    
-## 1    422 0.040661                                  
-## 2    419 0.032945  3 0.0077155 32.709 &lt; 2.2e-16 ***
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1    422 240.03                                  
+## 2    419 194.49  3    45.547 32.709 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
