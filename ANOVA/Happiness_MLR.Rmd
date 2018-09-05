@@ -1,7 +1,7 @@
 ---
 title: "Happy Analysis"
 author: "Angela Lee"
-date: "7/12/2018"
+date: "9/4/2018"
 output: 
   html_document:
     number_sections: yes
@@ -118,7 +118,7 @@ We test if all slope parameters are 0.
 The following is the hypothesis for the mutilple linear regression model for six features.
 
 
-$$   \begin{aligned} H_0: \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 PerceptionCorruption = 0 \end{aligned} $$
+$$   \begin{aligned} H_0: \beta_1 GDP +  \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 PerceptionCorruption = 0 \end{aligned} $$
 $$   \begin{aligned} H_a:  At\ Least\ One\ Of\ The\ Variables\ \beta_j \not= 0\end{aligned} $$
 ###Full Model: 
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  $$
