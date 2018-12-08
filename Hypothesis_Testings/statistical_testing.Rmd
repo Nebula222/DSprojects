@@ -1,0 +1,180 @@
+---
+title: "Hypothesis Testings"
+author: "Angela Lee"
+date: "12/4/2018"
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: no
+fontsize: 12pt
+---
+## summary
+To perform the following hypothesis testings to determine the relationship between the lung capacity and smoking. 
+1. Two Sample t-test
+2. Wilconxon (Wilcox) Rank-Sum test
+3. Chi-Square Independence test
+
+Before we conduct any test, we assume that:
+i. let x1, x2,...xn = a random sample from population 1.
+ii. let x21, x22,...xm = a random sample from population 2.
+iii. Two populations are independent.
+iv. both X1 and X2 are normal. 
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(readr)
+setwd('/Users/angela/DSProjects/Hypothesis_Testings')
+lungD = read_csv('./LungCapData.csv')
+
+```
+Here is the structure for the data.
+```{r dataset, include= TRUE}
+str(lungD)
+```
+
+## normality
+We need to check the normality for continuous variables. For example, the lung capacity is a continuous variable. By looking at the following qqplot for the lung capacity, the points seem to fall about a straight line. The lung capacity variable is normal.
+
+```{r normality, include=TRUE}
+qqnorm(lungD$LungCap)
+```
+
+## set up the Hypothesis
+Here is the hypothesis for the difference in means, assuming that variances are unknown.
+The null hypothesis is that there is no difference in the mean lung capacity for smokers and the non-smokers.
+$$   \begin{aligned} H_0: \mu1 - \mu2 = 0 \end{aligned} $$
+The alternative hypothesis is that the mean lung capaicity of smokers is different than the non-smokers.
+$$   \begin{aligned} H_A: \mu1 - \mu2 \not= 0 \end{aligned} $$
+
+## boxplot
+By examining the boxplot for the mean lung capacity smokers and non-smokers, we can see that the mean lung capaity for smokers is different than the non-smokers. However, we need to check the statistical significance for the mean difference by performing t-test and checking the p-value. 
+```{r explorative, include = TRUE }
+library(ggplot2)
+  
+ggplot(lungD, aes(x = Smoke, y = LungCap, fill = Smoke)) +
+  geom_boxplot() + 
+  labs(title = "fig 1. Average Lung Capacity for Smokers and Non-Smokers", x = "Smoke", y = "Lung Capacity")
+```
+
+## check variance
+It is important to perform levene test to examine the statistical significance for the population variance before we perform the t-test. This is because we need to pass an argument for equal variance (var.eq = TRUE/FALSE) in the t.test. If the variances are the same (var.eq= TRUE), we get a tighter bound. If the variances are not the same, we get a loser bound. We can actually determine the sample variance for the lung capacity between the smokers and the non-smokers here. The variance of lung capaicty for the non-smokers is 7.43 and the variance of lung capacity for the smokers is 3.55.
+
+```{r variance test, include= TRUE}
+var(lungD$LungCap[lungD$Smoke == 'no'])
+var(lungD$LungCap[lungD$Smoke == 'yes'])
+```
+
+
+## Levene test
+Levene test is used to test the statistical significance for the population variance. 
+
+We create hypotheses and perform the levene test to see how statistically significant is the variance difference. 
+
+$$   \begin{aligned} H_0: population\ variance\ of\ the\ lung\ capacity\ for\ smokers\ and\ non-smokers\ are\ the\ same. \end{aligned} $$
+
+$$   \begin{aligned} H_A: population\ variance\ of\ the\ lung\ capacity\ for\ smokers\ and\ non-smokers\ are\ different. \end{aligned}$$
+
+We reject the null hypothesis because the p-value in the following Levene test is smaller than 0.05 (p-value = 0.0003408).
+Result: at 5% statistical significance, we conclude that the population variance lung capacity between the two groups are different.
+```{r levene test, include= FALSE}
+#LeveneTest
+warnings = FALSE
+library('car')
+leveneTest(lungD$LungCap ~ lungD$Smoke)
+```
+
+
+
+
+
+## check p-value for statistically significance.
+Since the boxplot indicates the average lung capacity for smokers and non-smokers are different, let's assume the variance is also different. In the following t-test, we will set the var.eq = False. By looking at the p-value in the t-test, we can see the p-value (p-value = 0.0003927) is smaller than 0.05 (p> 0.05). We can reject the null hypothesis that there is no difference between mean lung capacity between smokers and non-smokers.
+```{r t-test, include = TRUE}
+t.test(lungD$LungCap ~ lungD$Smoke, mu = 0 , alternative = 'two.sided', conf= 0.95, var.eq = FALSE) 
+#OR!
+t.test(lungD$LungCap[lungD$Smoke == 'no'], lungD$LungCap[lungD$Smoke == 'yes'])
+
+#because the value is less than 0.05 we reject the null. reject that there is no diff between mean lung capacity between smokers and nonsmokers.
+```
+
+## Wilcox Test
+If the median lung capacity of the smokers and non-smokers are not normal in the qq-plot, we use Wilcox Rank Sum Test. Here are the hypotheses for the median lung capapcity of smokers and non-smokers. Wilcoxon Rank Test is used to check the statistical significance for the population median. 
+
+$$ \begin{aligned} H_0: median\ lung\ capacity\ for\ smokers\ and\ non-smokers\ are\ the\ same. \end{aligned} $$
+
+$$ \begin{aligned} H_A: median\ lung\ capacity\ for\ smokers\ and\ non-smokers\ are\ different. \end{aligned} $$
+By looking the following Wilcox test result, we reject the null hypothesis that the population median of the lung capacity for the smokers and non-smokers are the same because the p-value is smaller than 0.05 (p-value =  0.005538). 
+Result: at 5% statistical significance, we conclude that the median lung capacity between the two groups are different. 
+```{r wilcox test for median, include = FALSE}
+warnings = FALSE
+#wilcox test
+wilcox.test(lungD$LungCap ~ lungD$Smoke, conf.int = TRUE)
+```
+
+## contingency table
+
+A contingency table is a type of table that displays the multi-variate frequency distribution of the variables. Below is the contingency table for gender and smoking. 
+
+```{r contingency table, echo = FALSE}
+tab1 = table(lungD$Gender, lungD$Smoke)
+tab1 = addmargins(tab1); tab1
+tab2 = lungD %>%
+  select(Smoke, Gender) %>%
+  group_by(Smoke, Gender) %>% 
+  summarise(count= n()) %>% 
+  mutate(perc= count/sum(count)) 
+
+tab3 = lungD %>%
+  select(Gender) %>%
+  group_by(Gender) %>% 
+  summarise(count= n()) %>% 
+  mutate(perc= count/sum(count))
+tab3$Gender = factor(tab3$Gender, levels = c("female", "male"))
+```
+
+We can visualize the conditional and marginal distributions of the two variables in the population from the segmented barplot. The segmented portions in figure 2 represent the conditional distributions of smoking population affiliation with gender. Figure 3 shows the marginal distritions for the gender.If the gender and smoking were not associated, the conditional and marginal distributions would be identical. However, since data for the entire population is mostly unavailable, we must perform the inference methods to determine the association for two variables in the sample. One common procedure is the Chi Square Independence Test.
+```{r barplot, echo = FALSE}
+
+barplot_smoke <- ggplot() +
+  geom_bar(tab2, mapping= aes(x= Smoke, y= perc, fill = Gender), stat = "identity") + 
+  labs(title = "fig 2. Total Smokers Segmented by Gender", x = 'Smoke', y = '%' ) +
+  scale_fill_brewer(palette = "Set3") 
+
+barplot_total <- ggplot() +
+  geom_bar(tab3, mapping= aes(x= Gender, y= perc, fill= Gender), stat = "identity", position = "stack") +
+  labs(title = "fig 3. Marginal Distributions for Gender", x = 'Gender', y = '%' ) +
+  scale_fill_brewer(palette = "Set2") 
+
+barplot_smoke 
+barplot_total
+```
+
+## chi square test
+
+Pearson's chi square test is used to test the (categorical) variables and to evaluate that how likely any observed difference between the sets arose by chance.
+
+Let's say if we'd like to make an inference for the association between the gender and smoking, we use the chi square independence test to evaluate the statistical significance for the inference. Here are the hypotheses:
+
+$$ \begin{aligned} H_0: gender\ and\ smoking\ are\ not\ associated.\ \end{aligned} $$
+
+$$ \begin{aligned} H_A: gender\ and\ smoking\ are\ associated.\ \end{aligned} $$
+In order to determine the statistical signficance for the association between gender and smoking. We use chi square independence test and set the alpha to be 5%. 
+
+## chi square Test for gender and smoking
+Since the p-value is greater than 0.5 (p-value = 0.1866), we don't reject the null hypothesis. We conclude that gender and smoking are not associated at alpha = 5% significance level.
+```{r, include=TRUE}
+t = chisq.test(tab1); t
+```
+
+## expected frequencies 
+The idea behind the chi square independence test is to compare the observed frequencies with the frequencies we would expect if the null hypothesis of non-association is true.
+Here is the test statistic formula, where O = observed frequency. E = expected frequency.
+$$ \begin{aligned} x^2= \sum(O - E)^2/E \end{aligned} $$
+here are the expected frequencies for gender and smoking.
+```{r, include= TRUE}
+t$expected
+```
+
