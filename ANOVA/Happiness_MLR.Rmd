@@ -1,7 +1,7 @@
 ---
-title: "Happy Analysis"
+title: "Happy Index with the Analysis of the Variance"
 author: "Angela Lee"
-date: "9/4/2018"
+date: "10/20/2023"
 output: 
   html_document:
     number_sections: yes
@@ -15,7 +15,7 @@ fontsize: 12pt
 
 
 ## Introduction
-The 2018 World Happiness Report is a survey that ranks 156 countries by their happiness level. It is published by the Sustainable Development Solutions Network(SDSN). The 2018 release of Gallup World Poll covers 1,562 observations of happiness scores from 2005 to 2017. Not all the countries and territories appear in all the years. For example, Canada is not included in the 2017 Happiness Index. 
+The 2023 World Happiness Report is a survey that ranks 137 countries by their happiness level. It is published by the Sustainable Development Solutions Network(SDSN). The 2023 release of Gallup World Poll covers 137 observations of happiness scores. 
 
 
 ```{r setup, include=FALSE}
@@ -25,85 +25,94 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(stats)
+library(shiny)
+library(rsconnect)
+library(car)
 
 suppressWarnings(library(knitr))
 suppressWarnings(library(readr))
-Happiness <- read_csv("./WHR2018.csv")
-
+Happiness <- read_csv("./Happiness2023.csv")
+summary(Happiness)
 ```
 
+
+```{r descriptive stats, include= TRUE}
+
+summary(Happiness)
+
+```
 ##  Subset the data for using only the key features mentioned the World Happiness Report. 
-They are GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, Perceptions of Corruption for the years between 2015 and 2016, and 2017. The new data frame is called H1018. 
-```{r, echo= FALSE}
+GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, Perceptions of Corruption are the independant variables for the Happiness Index (Happy Ladder). 
+```{r, echo= TRUE}
 
-H2018 <- Happiness[, 1:9]
-H2018 <- H2018 %>% filter(year %in% c(2015, 2016, 2017))
+
+# Filter the data for country and happy score
+
+H2023 <-  Happiness %>% select('Country name', 'Ladder score', 'Logged GDP per capita', 'Social support', 
+                               'Healthy life expectancy', 'Freedom to make life choices', 'Generosity', 'Perceptions of corruption')
+
+
 
 ```
 
 
-## Check the new dimension for H2018 - 426 x 9 
+## Check the new dimension for H2023 - 137 x 8
 
 ```{r}
-dim(H2018)
+dim(H2023)
 ```
 
 ## Checking Missing Data 
 
-Here are 74 missing records in the new data frame - H2018. Fill missing data with 0's.
+Here is 1 missing record in the new data frame - H2018. Fill missing data with 0's.
+
+```{r, echo= TRUE}
+
+sum(is.na(H2023))
+
+H2023[is.na(H2023)] <- 0
+
+sum(is.na(H2023))
+```
+
+## Happiness Score Distribution. It looks like an almost normal distribution
 
 ```{r, echo= FALSE}
 
-sum(is.na(H2018))
-
-H2018[is.na(H2018)] <- 0
-
-sum(is.na(H2018))
+H2023$`Ladder score` = as.numeric(H2023$`Ladder score`)
+hist(H2023$`Ladder score`, xlab = "Happiness Index", main = "Happiness Score Distribution - 2023", col = "thistle")
 ```
 
-
-## Happiness Score Distribution
-
+The standard deviation is 1.14
 ```{r, echo= FALSE}
-hist(H2018$`Life Ladder`, xlab = "Happiness Index", main = "Happiness Score Distribution - 2015, 2016, 2017", col = "thistle")
+sd(H2023$`Ladder score`)
+
+Happy =  H2023[, 2:8]
 ```
 
-The standard deviation is 1.12
-```{r, echo= FALSE}
-sd(H2018$`Life Ladder`)
-```
-
-## Extract 6 key features and put them in the new data frame
-
-```{r, include=TRUE}
-happy_df <- H2018[, 3:9]
-#sum(is.na(happy_df))
-```             
 
 ## Let's create a multiple linear regression model using the six key features. 
 
-
 We look at the coefficients in the t-test. The MLR function for the six key features is the following:
 
-Life Ladder (Happiness) = -0.54 + 0.03 GDP + 2.99 Social Support + 0.04 Healthy Life Expectancy + 1.25 Freedom - 0.32 Generosity - 0.70 Perceptions of Corruption
+Ladder Score (Happiness) = -1.71 + 0.23 GDP + 4.09 Social Support + 0.01 Healthy Life Expectancy + 2.31 Freedom + 0.10 Generosity - 0.83 Perceptions of Corruption
 
 The coefficient of multiple determination, R squared ($R^{2}$) lies between 0 and 1 and is a descriptive measure of the utility of the regression for making predictions. Since the ($R^{2}$) always increases as we increase a variable x in the MLR model, we should look at the adjusted ($R^{2}$). The ($R^{2}$) only increases if the new varialble enhances the model beyond what would be obtained by chance and decreases when a predictor variable enhances the model less than what is expected by chance. 
 
-The adjusted for R squared is 0.6325  ($R^{2}$= 0.6325), which indicates the regression equation is SOMEWHAT useful for making predictions.
+The adjusted for R squared is 0.8194  ($R^{2}$= 0.8194), which indicates the regression equation is useful for making predictions.
 ```{r, include = TRUE}
-df <- lm(`Life Ladder` ~., data = happy_df)
+df <- lm(`Ladder score` ~., data = Happy)
 summary(df)
 ```
 
 ## Model Intepretation:
-Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particular GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.6813. 
+Our best estimate for the common standard deviation of all life ladder (happiness index) for all countries at any particular GDP, Social Support, Healthy Life Expectancy, Freedom, Generosity, and corruption is 0.4845. 
 
 ## Variance Inflation Factor: 
 
 Let's check if any of the six key variables have multicollinearity. VIF measures and indicates how much variance of an estimated regression coefficient is increased because of collinearity. If any of these variables has high VIF, then it is a highly correlated predictor variable. By looking at the variance inflation factor below, none of these key variables has VIF higher than 5, thus they are not highly correlated predictor variables. 
 
 ```{r, include = TRUE}
-library(car)
 warning = FALSE
 vif(df)
 ```
@@ -125,29 +134,29 @@ $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + 
 ###Reduced Model:
 $$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 \end{aligned}$$
 ## Hypothesis Intepretation:
-By looking at the F statistics and the p value (${p < 2.2e-16 }$), we can interpret that at the 5% significance level, the data provide sufficient evidence to conclude that at least one of the life ladder (happiness index) regression coefficients is not 0. We reject the null hypothesis. Therefore, taken together, GDP, social support, healthly life expectancy at birth, freedom, generosity, and perceptions of corruption are useful in predicting happiness for a country. 
+By looking at the F statistics and the p value (${p < 2.2e-16 }$), we can interpret that at the 5% significance level, the data provide sufficient evidence to conclude that at least one of the ladder score (happiness index) regression coefficients is not 0. We reject the null hypothesis. Therefore, taken together, GDP, social support, healthly life expectancy at birth, freedom, generosity, and perceptions of corruption are useful in predicting happiness for a country. 
 
 ## ANOVA - MLR Hypothesis - case 2 
-In this second scenario, based on the p value for the t test above, it looks like GDP and Generosity are not statistically significant (p > 0.05). In other words, is happiness significantly related to GDP, Soical Support, and Generosity after taking into account other factors such as Health, Freedom, and Perceptions of Corruption? Let’s make another hypothesis for the second case.
+In this second scenario, based on the p value for the t test above, it looks like Healthy Life Expectancy and Generosity are not statistically significant (p > 0.05). In other words, is happiness significantly related to Healthy Life Expectancy and Generosity after taking into account other factors such as GDP, Soical Support, Freedom, and Perceptions of Corruption? Let’s make another hypothesis for the second case.
 
 
-$$   \begin{aligned} H_0: \beta_1 GDP = \beta_5 Generosity  = 0 \end{aligned} $$
+$$   \begin{aligned} H_0: \beta_3 \ Healthy\ Life\ Expectancy\ = \beta_5\  Generosity  = 0 \end{aligned} $$
 
-$$   \begin{aligned} H_a:  At\ Least\ One\ Of\ The\ Variables\ \beta_1, \beta_5 \not= 0\end{aligned} $$
+$$   \begin{aligned} H_a:  At\ Least\ One\ Of\ The\ Variables\ \beta_3, \beta_5 \not= 0\end{aligned} $$
  
 
 ###Full Model:
-$$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 SocialSupport+ \beta_3 Health + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  $$
+$$   \begin{aligned} Ladder\ Score\ (Happiness\ Index) = \beta_0 + \beta_1 GDP + \beta_2 Social\ Support+ \beta_3 Health\ Life + \beta_4 Freedom + \beta_5 Generosity + \beta_6 Perception\ Corruption \end{aligned}  $$
  
 ###Reduced Model:
 
  
-$$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_2 SocialSupport + \beta_3 Health + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  $$
-## ANOVA for the partial model interpretation: 
+$$   \begin{aligned} Life\ Ladder\ (Happiness\ Index) = \beta_0 + \beta_1 GDP +  \beta_2 Social\ Support + \beta_4 Freedom + \beta_6 Perception\ Corruption \end{aligned}  $$
+## Analysis of Variance(ANOVA) for the partial model interpretation: 
 
-By looking at the p value for the f test, p value = 2.2e-16 (p < 0.05), we reject the null hypothesis. At the 5% significance level, the data provides sufficient edvidence to reject the null ${beta_1 = beta_5 = 0}$. Hence, in conjunction with other variables, GDP and Generosity are useful predictors of the happiness. 
+By looking at the p value for the f test, p value = 0.3764 (p > 0.05), we DO NOT reject the null hypothesis. At the 5% significance level, the data provides insufficient edvidence to reject the null ${beta_3 = beta_5 = 0}$. Hence, in conjunction with other variables, Healthy Life Expectancy and Generosity are not useful predictors of the happiness. 
 ```{r, include= TRUE}
-partial_H <- lm(`Life Ladder` ~ `Healthy life expectancy at birth` + `Freedom to make life choices` + `Perceptions of corruption` , data = happy_df)
+partial_H <- lm(`Ladder score` ~ `Logged GDP per capita` + `Social support` + `Freedom to make life choices` + `Perceptions of corruption` , data = H2023)
 
 anova(partial_H, df)
 
